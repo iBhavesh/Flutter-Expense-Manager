@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import './widgets/new_transaction.dart';
 import './widgets/chart.dart';
@@ -7,13 +6,7 @@ import './widgets/transaction_list.dart';
 
 import './models/transaction.dart';
 
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
-  runApp(MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
@@ -53,44 +46,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final List<Transaction> _userTransactions = [
-    Transaction(
-      amount: 85.52,
-      date: DateTime.now().subtract(Duration(days: 1)),
-      id: 1,
-      title: 'New Book',
-    ),
-    Transaction(
-      amount: 67.54,
-      date: DateTime.now(),
-      id: 2,
-      title: 'Shoes',
-    ),
-    Transaction(
-      amount: 67.54,
-      date: DateTime.now(),
-      id: 3,
-      title: 'Shoes',
-    ),
-    Transaction(
-      amount: 67.54,
-      date: DateTime.now(),
-      id: 4,
-      title: 'Shoes',
-    ),
-    Transaction(
-      amount: 67.54,
-      date: DateTime.now(),
-      id: 5,
-      title: 'Shoes',
-    ),
-    Transaction(
-      amount: 67.54,
-      date: DateTime.now(),
-      id: 6,
-      title: 'Shoes',
-    ),
-  ];
+  final List<Transaction> _userTransactions = transactions;
+
+  var _showChart = true;
 
   List<Transaction> get _recentTransactions {
     return _userTransactions.where((element) {
@@ -144,24 +102,69 @@ class _MyHomePageState extends State<MyHomePage> {
       ],
     );
 
+    final _mediaQuery = MediaQuery.of(context);
+    final _isLandscape =
+        _mediaQuery.orientation == Orientation.landscape ? true : false;
+
     return Scaffold(
       appBar: _appBar,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(
-                height: (MediaQuery.of(context).size.height -
+            if (_isLandscape)
+              Container(
+                height: (_mediaQuery.size.height -
                         _appBar.preferredSize.height -
-                        MediaQuery.of(context).padding.top) *
+                        _mediaQuery.padding.top) *
+                    0.2,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Show Chart'),
+                    Switch(
+                        value: _showChart,
+                        onChanged: (value) {
+                          setState(() {
+                            _showChart = value;
+                          });
+                        }),
+                  ],
+                ),
+              ),
+            if (!_isLandscape)
+              Container(
+                height: (_mediaQuery.size.height -
+                        _appBar.preferredSize.height -
+                        _mediaQuery.padding.top) *
                     0.3,
-                child: Chart(_recentTransactions)),
-            Container(
-                height: (MediaQuery.of(context).size.height -
+                child: Chart(_recentTransactions),
+              ),
+            if (!_isLandscape)
+              Container(
+                height: (_mediaQuery.size.height -
                         _appBar.preferredSize.height -
-                        MediaQuery.of(context).padding.top) *
+                        _mediaQuery.padding.top) *
                     0.7,
-                child: TransactionList(_userTransactions, _deleteTransaction)),
+                child: TransactionList(_userTransactions, _deleteTransaction),
+              ),
+            if (_isLandscape)
+              _showChart
+                  ? Container(
+                      height: (_mediaQuery.size.height -
+                              _appBar.preferredSize.height -
+                              _mediaQuery.padding.top) *
+                          0.7,
+                      child: Chart(_recentTransactions),
+                    )
+                  : Container(
+                      height: (_mediaQuery.size.height -
+                              _appBar.preferredSize.height -
+                              _mediaQuery.padding.top) *
+                          0.7,
+                      child: TransactionList(
+                          _userTransactions, _deleteTransaction),
+                    ),
           ],
         ),
       ),
