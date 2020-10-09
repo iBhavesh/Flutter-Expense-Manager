@@ -14,33 +14,46 @@ class TransactionItem extends StatelessWidget {
       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 6),
       elevation: 5,
       child: ListTile(
-        leading: CircleAvatar(
-          radius: 30,
-          child: Padding(
-            padding: const EdgeInsets.all(6.0),
-            child: FittedBox(
-              child: Text('\$${_tx.amount}'),
+          leading: CircleAvatar(
+            radius: 30,
+            child: Padding(
+              padding: const EdgeInsets.all(6.0),
+              child: FittedBox(
+                child: Text('\$${_tx.amount}'),
+              ),
             ),
           ),
-        ),
-        title: Text(
-          _tx.title,
-          style: Theme.of(context).textTheme.headline6,
-        ),
-        subtitle: Text(
-          DateFormat.yMMMd().format(_tx.date),
-          style: TextStyle(
-            color: Colors.grey,
+          title: Text(
+            _tx.title,
+            style: Theme.of(context).textTheme.headline6,
           ),
-        ),
-        trailing: IconButton(
-          icon: Icon(
-            Icons.delete,
-            color: Theme.of(context).errorColor,
+          subtitle: Text(
+            DateFormat.yMMMd().format(_tx.date),
+            style: TextStyle(
+              color: Colors.grey,
+            ),
           ),
-          onPressed: () => _deleteTransaction(_tx.id),
-        ),
-      ),
+          trailing: MediaQuery.of(context).size.width > 400
+              ? TextButton.icon(
+                  icon: Icon(
+                    Icons.delete,
+                  ),
+                  label: Text(
+                    'Delete Transaction',
+                  ),
+                  style: ButtonStyle(
+                    foregroundColor:
+                        MaterialStateProperty.all(Theme.of(context).errorColor),
+                  ),
+                  onPressed: () => _deleteTransaction(_tx.id),
+                )
+              : IconButton(
+                  icon: Icon(
+                    Icons.delete,
+                    color: Theme.of(context).errorColor,
+                  ),
+                  onPressed: () => _deleteTransaction(_tx.id),
+                )),
     );
   }
 }

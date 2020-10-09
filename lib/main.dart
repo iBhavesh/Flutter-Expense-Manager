@@ -46,7 +46,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final List<Transaction> _userTransactions = transactions;
+  final List<Transaction> _userTransactions = [];
 
   var _showChart = true;
 
@@ -75,10 +75,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _showAddNewTransaction(BuildContext ctx) {
     showModalBottomSheet(
+      isScrollControlled: true,
       context: ctx,
-      builder: (_) {
-        return NewTransaction(_addTransaction);
-      },
+      builder: (_) => NewTransaction(_addTransaction),
     );
   }
 
@@ -90,7 +89,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final _appBar = AppBar(
+    final mediaQuery = MediaQuery.of(context);
+    final isLandscape =
+        mediaQuery.orientation == Orientation.landscape ? true : false;
+
+    final appBar = AppBar(
       title: Text(
         'Expense Tracker',
       ),
@@ -102,21 +105,25 @@ class _MyHomePageState extends State<MyHomePage> {
       ],
     );
 
-    final _mediaQuery = MediaQuery.of(context);
-    final _isLandscape =
-        _mediaQuery.orientation == Orientation.landscape ? true : false;
+    final txListWidget = Container(
+      height: (mediaQuery.size.height -
+              appBar.preferredSize.height -
+              mediaQuery.padding.top) *
+          0.7,
+      child: TransactionList(_userTransactions, _deleteTransaction),
+    );
 
     return Scaffold(
-      appBar: _appBar,
+      appBar: appBar,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (_isLandscape)
+            if (isLandscape)
               Container(
-                height: (_mediaQuery.size.height -
-                        _appBar.preferredSize.height -
-                        _mediaQuery.padding.top) *
+                height: (mediaQuery.size.height -
+                        appBar.preferredSize.height -
+                        mediaQuery.padding.top) *
                     0.2,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -132,39 +139,25 @@ class _MyHomePageState extends State<MyHomePage> {
                   ],
                 ),
               ),
-            if (!_isLandscape)
+            if (!isLandscape)
               Container(
-                height: (_mediaQuery.size.height -
-                        _appBar.preferredSize.height -
-                        _mediaQuery.padding.top) *
+                height: (mediaQuery.size.height -
+                        appBar.preferredSize.height -
+                        mediaQuery.padding.top) *
                     0.3,
                 child: Chart(_recentTransactions),
               ),
-            if (!_isLandscape)
-              Container(
-                height: (_mediaQuery.size.height -
-                        _appBar.preferredSize.height -
-                        _mediaQuery.padding.top) *
-                    0.7,
-                child: TransactionList(_userTransactions, _deleteTransaction),
-              ),
-            if (_isLandscape)
+            if (!isLandscape) txListWidget,
+            if (isLandscape)
               _showChart
                   ? Container(
-                      height: (_mediaQuery.size.height -
-                              _appBar.preferredSize.height -
-                              _mediaQuery.padding.top) *
+                      height: (mediaQuery.size.height -
+                              appBar.preferredSize.height -
+                              mediaQuery.padding.top) *
                           0.7,
                       child: Chart(_recentTransactions),
                     )
-                  : Container(
-                      height: (_mediaQuery.size.height -
-                              _appBar.preferredSize.height -
-                              _mediaQuery.padding.top) *
-                          0.7,
-                      child: TransactionList(
-                          _userTransactions, _deleteTransaction),
-                    ),
+                  : txListWidget,
           ],
         ),
       ),
